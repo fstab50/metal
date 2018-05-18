@@ -1,21 +1,21 @@
 """
 Summary:
-    bashtools (python3) | Installer for Bash Tools for AWS
+    metal (python3) | Security App Installation & Configuration
 
 Author:
     Blake Huber
     Copyright Blake Huber, All Rights Reserved.
 
 License:
-    MIT License
+    GNU General Public License v3.0 (GPL-3)
     Additional terms may be found in the complete license agreement:
-    https://github.com/fstab50/bashtools
+    https://github.com/fstab50/metal/LICENSE
 
 OS Support:
     - RedHat Linux, Amazon Linux, Ubuntu & variants
 
 Dependencies:
-    - Installer tested under py3.5 and py3.6, may work under python2.7
+    - Installer tested under py3.5 and py3.6, requires bash v4+ locally
 """
 
 import os
@@ -27,14 +27,14 @@ import inspect
 import subprocess
 import boto3
 from botocore.exceptions import ClientError, ProfileNotFound
-from bashtools.colors import Colors
-from bashtools import about, configuration, logd, __version__
+from metal.colors import Colors
+from metal import about, configuration, logd, __version__
 
 try:
-    from bashtools.oscodes_unix import exit_codes
+    from metal.oscodes_unix import exit_codes
     splitchar = '/'     # character for splitting paths (linux)
 except Exception:
-    from bashtools.oscodes_win import exit_codes    # non-specific os-safe codes
+    from metal.oscodes_win import exit_codes    # non-specific os-safe codes
     splitchar = '\\'    # character for splitting paths (window
 
 # global objects
@@ -43,8 +43,8 @@ logger = logd.getLogger(__version__)
 
 # global vars
 IAM_KEYS = ['aws_access_key_id', 'aws_secret_access_key']
-VALID_OPERATIONS = ('list', 'up', 'bashtools', 'rotate')
-ROTATE_OPERATIONS = ('up', 'bashtools', 'rotate')
+VALID_OPERATIONS = ('list', 'up', 'metal', 'rotate')
+ROTATE_OPERATIONS = ('up', 'metal', 'rotate')
 DBUG_FILE = 'test-credentials'
 
 
@@ -328,6 +328,12 @@ class SetLogging():
         return True
 
 
+def parameters(args):
+    parameter_str = ''
+    for arg in args:
+        parameter_str += arg + ' '
+    return parameter_str
+
 
 def main(operation, profile, auto, debug, user_name=''):
     """
@@ -336,6 +342,14 @@ def main(operation, profile, auto, debug, user_name=''):
     if user_name:
         logger.info('user_name parameter given (%s) as surrogate' % user_name)
 
+    cmd = 'sudo sh rkhunter-install.sh ' + parameters(sys.argv[1:])
+
+    subprocess.call(
+            [cmd], shell=True,
+            cwd='/home/blake/git/Security/gensec/rkhunter'
+            )
+
+    sys.exit(0)
     # find out to which iam user profile name maps
     user, aws_account = map_identity(profile=profile)
 
@@ -432,7 +446,7 @@ def shared_credentials_location():
 def option_configure(debug=False, path=None):
     """
     Summary:
-        Initiate configuration menu to customize bashtools runtime options.
+        Initiate configuration menu to customize metal runtime options.
         Console script ```keyconfig``` invokes this option_configure directly
         in debug mode to display the contents of the local config file (if exists)
     Args:
@@ -452,7 +466,7 @@ def option_configure(debug=False, path=None):
         else:
             msg = """  Local config file does not yet exist. Run:
 
-            $ bashtools --configure """
+            $ metal --configure """
             debug_mode(msg, {'CONFIG_PATH': path}, debug, halt=True)
     r = configuration.init(debug, path)
     return r
@@ -507,7 +521,7 @@ def init_cli():
 
     failure = """ : Check of runtime parameters failed for unknown reason.
     Please ensure local awscli is configured. Then run keyconfig to
-    configure bashtools runtime parameters.   Exiting. Code: """
+    configure metal runtime parameters.   Exiting. Code: """
     logger.warning(failure + 'Exit. Code: %s' % sys.exit(exit_codes['E_MISC']['Code']))
     print(failure)
 
