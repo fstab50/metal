@@ -1,4 +1,4 @@
-name: keyup 
+name: metal 
 
 channels:
     - conda-forge
@@ -9,5 +9,3 @@ dependencies:
     - pip:
         - sphinx_rtd_theme
         - boto3
-        - tqdm 
-        - curses-menu

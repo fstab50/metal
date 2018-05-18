@@ -12,7 +12,7 @@
 #       pkg:        script name reported in logs will be the basename of the caller
 #
 
-PROJECT='keyup'
+PROJECT='metal'
 pkg=$(basename $0)                                      # pkg (script) full name
 pkg_root="$(echo $pkg | awk -F '.' '{print $1}')"       # pkg without file extention
 pkg_path=$(cd $(dirname $0); pwd -P)                    # location of pkg
@@ -24,7 +24,7 @@ tests_dir=$ROOT'/tests'
 test_assets=$ROOT'/tests/assets'
 test_credential_file="$test_assets/test-user-credentials.ini"
 log_dir="$HOME/logs"
-log_file="$log_dir/keyup-testsetup.log"
+log_file="$log_dir/metal-testsetup.log"
 PROFILE='gcreds-da-atos'
 VERSION='1.0'
 
@@ -353,7 +353,7 @@ if [ $test_user0 ]; then
     presetup_check $test_user0
 fi
 
-std_message "${title}keyup${bodytext} Automated Testing Setup Check -- Start" "INFO"  $log_file
+std_message "${title}metal${bodytext} Automated Testing Setup Check -- Start" "INFO"  $log_file
 
 # check dependencies
 aws_default_region
