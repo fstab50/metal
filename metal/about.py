@@ -10,14 +10,14 @@ Returns:
 
 import sys
 import datetime
-from bashtools.statics import PACKAGE, LICENSE
-from bashtools.colors import Colors
-from bashtools import __version__
+from metal.statics import PACKAGE, LICENSE
+from metal.colors import Colors
+from metal import __version__
 
 
 # url formatting
-url_sc = Colors.URL + 'https://github.com/fstab50/bashtools' + Colors.RESET
-url_lic = Colors.URL + 'https://github.com/fstab50/bashtools/blob/master/LICENSE' + Colors.RESET
+url_sc = Colors.URL + 'https://github.com/fstab50/metal' + Colors.RESET
+url_lic = Colors.URL + 'https://github.com/fstab50/metal/blob/master/LICENSE' + Colors.RESET
 url_aws = Colors.URL + 'https://aws.amazon.com' + Colors.RESET
 
 # aws header

@@ -1,12 +1,12 @@
 """
 Summary:
-    bashtools Project-level Defaults and Settings
+    metal Project-level Defaults and Settings
 
     - **Local Default Settings**: Local defaults for your specific installation are derived from settings found in:
 
     .. code-block:: bash
 
-        ~/.config/bashtools/config.json
+        ~/.config/metal/config.json
 
 Module Attributes:
     - user_home (TYPE str):
@@ -20,8 +20,8 @@ Module Attributes:
 import os
 import inspect
 import logging
-from bashtools.script_utils import read_local_config
-from bashtools import __version__
+from metal.script_utils import read_local_config
+from metal import __version__
 
 logger = logging.getLogger(__version__)
 logger.setLevel(logging.INFO)
@@ -44,7 +44,7 @@ else:
     # section with appropriate pathnames
 
     # project
-    PACKAGE = 'bashtools'
+    PACKAGE = 'metal'
     LICENSE = 'MIT'
     LICENSE_DESC = 'MIT License'
     version = __version__
@@ -59,7 +59,7 @@ else:
     # logging parameters
     enable_logging = False
     log_mode = 'FILE'
-    log_filename = 'bashtools.log'
+    log_filename = 'metal.log'
     log_dir = user_home + '/' + 'logs'
     log_path = log_dir + '/' + log_filename
 

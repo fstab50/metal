@@ -6,8 +6,8 @@ Help Menu
 
 """
 
-from keyup.statics import PACKAGE, CONFIG_SCRIPT
-from keyup.colors import Colors
+from metal.statics import PACKAGE, CONFIG_SCRIPT
+from metal.colors import Colors
 
 
 PKG_ACCENT = Colors.ORANGE
@@ -20,8 +20,8 @@ synopsis_cmd = (
     PARAM_ACCENT + '--operation ' + Colors.RESET + '[OPERATION]'
     )
 
-url_doc = Colors.URL + 'http://keyup.readthedocs.io' + Colors.RESET
-url_sc = Colors.URL + 'https://bitbucket.org/blakeca00/keyup' + Colors.RESET
+url_doc = Colors.URL + 'http://metal.readthedocs.io' + Colors.RESET
+url_sc = Colors.URL + 'https://github.com/fstab50/metal' + Colors.RESET
 
 menu_body = Colors.BOLD + """
   DESCRIPTION""" + Colors.RESET + """

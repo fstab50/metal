@@ -6,7 +6,7 @@ import inspect
 import logging
 import logging.handlers
 
-from bashtools.statics import local_config
+from metal.statics import local_config
 
 syslog = logging.getLogger()
 syslog.setLevel(logging.DEBUG)

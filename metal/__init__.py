@@ -1,4 +1,4 @@
-from bashtools._version import __version__ as version
+from metal._version import __version__ as version
 
 
 __author__ = 'Blake Huber'
