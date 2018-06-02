@@ -24,7 +24,7 @@ host=$(hostname)
 system=$(uname)
 
 # this file
-VERSION="2.5.3"
+VERSION="2.5.1"
 
 if [ ! $pkg ] || [ ! $pkg_path ]; then
     echo -e "\npkg and pkg_path errors - both are null"
@@ -237,58 +237,46 @@ function is_installed(){
 }
 
 
-
 function linux_distro(){
     ## determine linux os distribution ##
     local os_major
-    local os_release
-    local os_codename
-    declare -a distro_info
+    local os_minor
 
-    if [ "$(which lsb_release)" ]; then
-        distro_info=( $(lsb_release -sirc) )
-        if [[ ${#distro_detect[@]} -eq 3 ]]; then
-            os_major=${distro_info[0]}
-            os_release=${distro_info[1]}
-            os_codename=${distro_info[2]}
-        fi
-    else
-        ## AMAZON Linux ##
-        if [ "$(grep -i amazon /etc/os-release  | head -n 1)" ]; then
-            os_major="amazonlinux"
-            if [ "$(grep VERSION_ID /etc/os-release | awk -F '=' '{print $2}')" = '"2"' ]; then
-                os_release="$(grep VERSION /etc/os-release | grep -v VERSION_ID | awk -F '=' '{print $2}')"
-                os_release=$(echo $os_release | cut -c 2-15 | rev | cut -c 2-15 | rev)
-            elif [ "$(grep VERSION_ID /etc/os-release | awk -F '=' '{print $2}')" = '"1"' ]; then
-                os_release="$(grep VERSION /etc/os-release | grep -v VERSION_ID | awk -F '=' '{print $2}')"
-                os_release=$(echo $os_release | cut -c 2-15 | rev | cut -c 2-15 | rev)
-            else os_release="unknown"; fi
+    ## AMAZON Linux ##
+    if [ "$(grep -i amazon /etc/os-release  | head -n 1)" ]; then
+        os_major="amazonlinux"
+        if [ "$(grep VERSION_ID /etc/os-release | awk -F '=' '{print $2}')" = '"2"' ]; then
+            os_minor="$(grep VERSION /etc/os-release | grep -v VERSION_ID | awk -F '=' '{print $2}')"
+            os_minor=$(echo $os_minor | cut -c 2-15 | rev | cut -c 2-15 | rev)
+        elif [ "$(grep VERSION_ID /etc/os-release | awk -F '=' '{print $2}')" = '"1"' ]; then
+            os_minor="$(grep VERSION /etc/os-release | grep -v VERSION_ID | awk -F '=' '{print $2}')"
+            os_minor=$(echo $os_minor | cut -c 2-15 | rev | cut -c 2-15 | rev)
+        else os_minor="unknown"; fi
 
-        ## REDHAT Linux ##
-        elif [ $(grep -i redhat /etc/os-release  | head -n 1) ]; then
-            os_major="redhat"
-            os_release="future"
+    ## REDHAT Linux ##
+    elif [ $(grep -i redhat /etc/os-release  | head -n 1) ]; then
+        os_major="redhat"
+        os_minor="future"
 
-        ## UBUNTU, ubuntu variants ##
-        elif [ "$(grep -i ubuntu /etc/os-release)" ]; then
-            os_major="ubuntu"
-            if [ "$(grep -i mint /etc/os-release | head -n1)" ]; then
-                os_release="linuxmint"
-            elif [ "$(grep -i ubuntu_codename /etc/os-release | awk -F '=' '{print $2}')" ]; then
-                os_release="$(grep -i ubuntu_codename /etc/os-release | awk -F '=' '{print $2}')"
-            else
-                os_release="unknown"; fi
-
-        ## distribution not determined ##
+    ## UBUNTU, ubuntu variants ##
+    elif [ "$(grep -i ubuntu /etc/os-release)" ]; then
+        os_major="ubuntu"
+        if [ "$(grep -i mint /etc/os-release | head -n1)" ]; then
+            os_minor="linuxmint"
+        elif [ "$(grep -i ubuntu_codename /etc/os-release | awk -F '=' '{print $2}')" ]; then
+            os_minor="$(grep -i ubuntu_codename /etc/os-release | awk -F '=' '{print $2}')"
         else
-            os_major="unknown"; os_release="unknown"
-        fi
+            os_minor="unknown"; fi
+
+    ## distribution not determined ##
+    else
+        os_major="unknown"; os_minor="unknown"
     fi
     # set distribution type in environment
     export OS_DISTRO="$os_major"
-    std_logger "Operating system identified as Major Version: $os_major, Minor Version: $os_release" "INFO" $LOG_FILE
+    std_logger "Operating system identified as Major Version: $os_major, Minor Version: $os_minor" "INFO" $LOG_FILE
     # return major, minor disto versions
-    echo "$os_major $os_release $os_codename"
+    echo "$os_major $os_minor"
 }
 
 
