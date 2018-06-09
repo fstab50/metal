@@ -9,12 +9,12 @@ class BadRCError(Exception):
     pass
 
 
-def run_command(cmd):
+def run_command_(cmd):
     """ No idea how th f to get this to work """
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode == 0:
-        os.killpg(os.getpgid(pro.pid), signal.SIGTERM) 
+        os.killpg(os.getpgid(pro.pid), signal.SIGTERM)
     else:
         raise BadRCError("Bad rc (%s) for cmd '%s': %s" % (process.returncode, cmd, stdout + stderr))
     return stdout
@@ -35,10 +35,10 @@ def parameters(args):
 
 
 cmd = 'sudo sh rkhunter-install.sh ' + parameters(sys.argv[1:])
-    
+
 subprocess.call(
         [cmd], shell=True,
-        cwd='/home/blake/git/Security/gensec/rkhunter'
+        cwd=os.getcwd() + '/' + 'rkhunter'
         )
 
 sys.exit(0)
@@ -65,12 +65,7 @@ with process.stdout:
         sys.stdout.write(line)
         sys.stdout.flush()
     if process.returncode == 0:
-        os.killpg(os.getpgid(pro.pid), signal.SIGTERM) 
+        os.killpg(os.getpgid(pro.pid), signal.SIGTERM)
         #process.kill()      # DOES NOT WORK
     else:
         raise BadRCError("Bad rc (%s) for cmd '%s': %s" % (p.returncode, cmd, stdout + stderr))
-
-
-
-
-
