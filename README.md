@@ -69,6 +69,7 @@ rkhunter-install will perform the following on your system to satisfy Rkhunter d
 * Ubuntu, Ubuntu variants, 16.04+
 * Redhat, Centos v7.0+
 * [Amazon Linux](https://aws.amazon.com/amazon-linux-ami) 2017+
+* Installation of required fonts (`ttf-mscorefonts-installer`)
 
 [back to the top](#top)
 

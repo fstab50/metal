@@ -1,6 +1,6 @@
 """
 
-Metal :  Copyright 2018-2019, Blake Huber
+metal :  Copyright 2018-2019, Blake Huber
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
