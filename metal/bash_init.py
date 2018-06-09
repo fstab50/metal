@@ -9,7 +9,7 @@ class BadRCError(Exception):
     pass
 
 
-def run_command_(cmd):
+def run_command_orig(cmd):
     """ No idea how th f to get this to work """
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
