@@ -12,6 +12,7 @@ import os
 import sys
 import inspect
 import hashlib
+import tarfile
 import urllib.request
 from urllib import parse
 import urllib.error
@@ -21,8 +22,10 @@ from metal import logd, __version__
 
 
 try:
+
     from metal.oscodes_unix import exit_codes
     splitchar = '/'     # character for splitting paths (linux)
+
 except Exception as e:
     msg = 'Import Error: %s. Exit' % str(e)
     stdout_message(msg, 'WARN')
@@ -63,9 +66,6 @@ def compile_binary(source):
         os.symlink(src, dst)
         # create symlink to binary in directory
     return False
-
-
-    pass
 
 
 def download():
@@ -147,7 +147,9 @@ def which(program):
 
 
 def precheck():
-    """ pre-run dependency check """
+    """
+    Pre-run dependency check
+    """
     if not which('make'):
         msg = 'Dependency fail -- Unable to locate rquired binary: '
         stdout_message('%s: %s' % (msg, ACCENT + 'make' + RESET))
@@ -171,7 +173,7 @@ def main():
 
 def root():
     """
-    Checks localhost sudo access
+    Checks localhost root or sudo access
     """
     if os.geteuid() == 0:
         return True
