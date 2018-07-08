@@ -1,6 +1,8 @@
 """
 Summary:
     Chkrootkit Installer
+    NOTE:  This script must be run with root priviledges
+
 Args:
 
 Returns:
@@ -36,15 +38,33 @@ RESET = Colors.RESET
 TMPDIR = '/tmp'
 
 
-def compile_binary():
+def compile_binary(source):
     """
     Prepare chkrootkit binary
     $ tar xzvf chkrootkit.tar.gz
     $ cd chkrootkit-0.52
     $ make sense
     sudo mv chkrootkit-0.52 /usr/local/chkrootkit
-    sudo ln -s /usr/local/chkrootkit/chkrootkit  /usr/local/bin/chkrootkit
+    sudo ln -s
     """
+    cmd = 'make sense'
+    mv_cmd = 'sudo mv ' + TMPDIR + '/' + extract_dir + ' /usr/local/chkrootkit'
+    src = '/usr/local/bin/chkrootkit'
+    dst = '/usr/local/chkrootkit/chkrootkit'
+    # Tar Extraction
+    t = tarfile.open(TMPDIR + '/' + source, 'r')
+    t.extractall(TMPDIR)
+    if isinstance(t.getnames(), list):
+        extract_dir = t.getnames()[0].split('/')[0]
+        os.chdir(TMPDIR + '/' + extract_dir)
+        logger.info('make output: \n%s' % subprocess.getoutput(cmd))
+        # move directory in place
+        subprocess.getoutput(mv_cmd)
+        os.symlink(src, dst)
+        # create symlink to binary in directory
+    return False
+
+
     pass
 
 
@@ -132,6 +152,8 @@ def precheck():
         msg = 'Dependency fail -- Unable to locate rquired binary: '
         stdout_message('%s: %s' % (msg, ACCENT + 'make' + RESET))
         return False
+    elif not root():
+        return False
     return True
 
 
@@ -139,12 +161,23 @@ def main():
     """
     Check Dependencies, download files, integrity check
     """
-    bin_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
+    tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
-    if precheck() and download() and valid_checksum(bin_file, chksum):
-        return compile_binary()
+    if precheck() and download() and valid_checksum(tar_file, chksum):
+        return compile_binary(tar_file)
     else:
         sys.exit(exit_codes['E_DEPENDENCY']['Code'])
+
+
+def root():
+    """
+    Checks localhost sudo access
+    """
+    if os.geteuid() == 0:
+        return True
+    elif subprocess.getoutput('sudo echo $EUID') == '0':
+        return True
+    return False
 
 
 if __main__ == '__name__':
