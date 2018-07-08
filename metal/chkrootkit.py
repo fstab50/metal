@@ -5,17 +5,6 @@ Args:
 
 Returns:
     Success | Failure, TYPE: bool
-
-
-    wget ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz
-    $ tar xzvf chkrootkit.tar.gz
-    wget ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.md5
-    $ md5sum -c chkrootkit.md5
-    $ cd chkrootkit-0.52
-    $ make sense
-    sudo mv chkrootkit-0.52 /usr/local/chkrootkit
-    sudo ln -s /usr/local/chkrootkit/chkrootkit  /usr/local/bin/chkrootkit
-
 """
 import os
 import sys
@@ -40,30 +29,51 @@ except Exception as e:
 
 # global objects
 logger = logd.getLogger(__version__)
-BINARY_URL = 'ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz'
-MD5_URL = 'ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.md5'
+BINARY_URL = 'https://s3.us-east-2.amazonaws.com/awscloud.center/chkrootkit/chkrootkit.tar.gz'
+MD5_URL = 'https://s3.us-east-2.amazonaws.com/awscloud.center/chkrootkit/chkrootkit.md5'
 ACCENT = Colors.BOLD + Colors.BRIGHTWHITE
 RESET = Colors.RESET
 TMPDIR = '/tmp'
 
 
-def download(filename):
-    """ Retrieve remote file object """
+def compile_binary():
+    """
+    Prepare chkrootkit binary
+    $ tar xzvf chkrootkit.tar.gz
+    $ cd chkrootkit-0.52
+    $ make sense
+    sudo mv chkrootkit-0.52 /usr/local/chkrootkit
+    sudo ln -s /usr/local/chkrootkit/chkrootkit  /usr/local/bin/chkrootkit
+    """
+    pass
+
+
+def download():
+    """
+    Retrieve remote file object
+    """
+    def exists(object):
+        if os.path.exists(TMPDIR + '/' + filename):
+            return True
+        else:
+            msg = 'File object %s failed to download to %s. Exit' % (filename, TMPDIR)
+            logger.warning(msg)
+            stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
+            return False
+    # url including file path
     urls = (BINARY_URL, MD5_URL)
     try:
         for file_path in urls:
             filename = file_path.split('/')[-1]
             r = urllib.request.urlretrieve(url, TMPDIR + '/' + filename)
-            if not os.path.exists(TMPDIR + '/' + filename):
-                msg = 'File object %s failed to download to %s. Exit' % (filename, TMPDIR)
-                logger.warning(msg)
-                stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
+            if not exists(filename):
                 return False
     except urllib.error.HTTPError as e:
         logger.exception(
             '%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
             (inspect.stack()[0][3], url, str(e), e.read())
         raise e
+    return True
 
 
 def valid_checksum(file, hash_file):
@@ -119,16 +129,20 @@ def which(program):
 def precheck():
     """ pre-run dependency check """
     if not which('make'):
-        msg = 'dependency fail -- Unable to locate rquired binary: '
+        msg = 'Dependency fail -- Unable to locate rquired binary: '
         stdout_message('%s: %s' % (msg, ACCENT + 'make' + RESET))
         return False
     return True
 
 
 def main():
-    """ Initializes script """
-    if precheck():
-
+    """
+    Check Dependencies, download files, integrity check
+    """
+    bin_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
+    chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
+    if precheck() and download() and valid_checksum(bin_file, chksum):
+        return compile_binary()
     else:
         sys.exit(exit_codes['E_DEPENDENCY']['Code'])
 
