@@ -63,8 +63,9 @@ def compile_binary(source):
         logger.info('make output: \n%s' % subprocess.getoutput(cmd))
         # move directory in place
         subprocess.getoutput(mv_cmd)
-        os.symlink(src, dst)
         # create symlink to binary in directory
+        os.symlink(src, dst)
+        return True
     return False
 
 
