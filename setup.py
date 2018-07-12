@@ -93,6 +93,7 @@ setup(
         'console_scripts': [
             'metal=metal.cli:init_cli',
             'metalconfig=metal.cli:option_configure'
+            'chkinstall=metal.chkrootkit:main'
         ]
     },
     zip_safe=False
