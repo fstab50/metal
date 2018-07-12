@@ -13,8 +13,8 @@ import sys
 import inspect
 import hashlib
 import tarfile
+import subprocess
 import urllib.request
-from urllib import parse
 import urllib.error
 from metal.script_utils import stdout_message
 from metal.colors import Colors
@@ -92,7 +92,7 @@ def download():
     except urllib.error.HTTPError as e:
         logger.exception(
             '%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
-            (inspect.stack()[0][3], url, str(e), e.read())
+            (inspect.stack()[0][3], url, str(e), e.read()))
         raise e
     return True
 
@@ -164,12 +164,14 @@ def main():
     """
     Check Dependencies, download files, integrity check
     """
+    # vars
     tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
+    # pre-run validation + execution
     if precheck() and download() and valid_checksum(tar_file, chksum):
         return compile_binary(tar_file)
-    else:
-        sys.exit(exit_codes['E_DEPENDENCY']['Code'])
+    logger.warning('%s: Pre-run dependency check fail - Exit' % inspect.stack()[0][3])
+    sys.exit(exit_codes['E_DEPENDENCY']['Code'])
 
 
 def root():
@@ -183,5 +185,5 @@ def root():
     return False
 
 
-if __main__ == '__name__':
+if __name__ == '__main__':
     sys.exit(main())
