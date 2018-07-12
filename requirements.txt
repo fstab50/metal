@@ -1,8 +1,10 @@
-awscli<=1.15.21
-botocore<=1.10.21
-docutils==0.14
-jmespath==0.9.3
-Pygments==2.2.0
+awscli
+botocore
+boto3
+docutils
+jmespath
+metal
+Pygments
 s3transfer
 six
 twine
