@@ -51,7 +51,6 @@ def compile_binary(source):
     sudo ln -s
     """
     cmd = 'make sense'
-    mv_cmd = 'sudo mv ' + TMPDIR + '/' + extract_dir + ' /usr/local/chkrootkit'
     src = '/usr/local/bin/chkrootkit'
     dst = '/usr/local/chkrootkit/chkrootkit'
     # Tar Extraction
@@ -62,6 +61,7 @@ def compile_binary(source):
         os.chdir(TMPDIR + '/' + extract_dir)
         logger.info('make output: \n%s' % subprocess.getoutput(cmd))
         # move directory in place
+        mv_cmd = 'sudo mv %s /%s/usr/local/chkrootkit' % (TMPDIR, extract_dir)
         subprocess.getoutput(mv_cmd)
         # create symlink to binary in directory
         os.symlink(src, dst)
