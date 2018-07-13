@@ -34,6 +34,7 @@ except Exception as e:
 
 # global objects
 logger = logd.getLogger(__version__)
+# global objects
 BINARY_URL = 'https://s3.us-east-2.amazonaws.com/awscloud.center/chkrootkit/chkrootkit.tar.gz'
 MD5_URL = 'https://s3.us-east-2.amazonaws.com/awscloud.center/chkrootkit/chkrootkit.md5'
 ACCENT = Colors.BOLD + Colors.BRIGHTWHITE
@@ -54,17 +55,17 @@ def compile_binary(source):
     src = '/usr/local/bin/chkrootkit'
     dst = '/usr/local/chkrootkit/chkrootkit'
     # Tar Extraction
-    t = tarfile.open(TMPDIR + '/' + source, 'r')
+    t = tarfile.open(source, 'r')
     t.extractall(TMPDIR)
     if isinstance(t.getnames(), list):
         extract_dir = t.getnames()[0].split('/')[0]
         os.chdir(TMPDIR + '/' + extract_dir)
         logger.info('make output: \n%s' % subprocess.getoutput(cmd))
         # move directory in place
-        mv_cmd = 'sudo mv %s /%s/usr/local/chkrootkit' % (TMPDIR, extract_dir)
+        mv_cmd = 'sudo mv %s /usr/local/chkrootkit' % (TMPDIR + '/' + extract_dir)
         subprocess.getoutput(mv_cmd)
         # create symlink to binary in directory
-        os.symlink(src, dst)
+        os.symlink(dst, src)
         return True
     return False
 
@@ -92,7 +93,7 @@ def download():
     except urllib.error.HTTPError as e:
         logger.exception(
             '%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
-            (inspect.stack()[0][3], url, str(e), e.read()))
+            (inspect.stack()[0][3], file_path, str(e), e.read()))
         raise e
     return True
 
@@ -151,12 +152,14 @@ def precheck():
     """
     Pre-run dependency check
     """
-    if not which('make'):
-        msg = 'Dependency fail -- Unable to locate rquired binary: '
-        stdout_message('%s: %s' % (msg, ACCENT + 'make' + RESET))
-        return False
-    elif not root():
-        return False
+    binaries = ['make']
+    for bin in binaries:
+        if not which(bin):
+            msg = 'Dependency fail -- Unable to locate rquired binary: '
+            stdout_message('%s: %s' % (msg, ACCENT + bin + RESET))
+            return False
+        elif not root():
+            return False
     return True
 
 
@@ -168,7 +171,11 @@ def main():
     tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
     # pre-run validation + execution
-    if precheck() and download() and valid_checksum(tar_file, chksum):
+    if precheck():
+        stdout_message('begin download')
+        download()
+        stdout_message('begin valid_checksum')
+        valid_checksum(tar_file, chksum)
         return compile_binary(tar_file)
     logger.warning('%s: Pre-run dependency check fail - Exit' % inspect.stack()[0][3])
     return False
