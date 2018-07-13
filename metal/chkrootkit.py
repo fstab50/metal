@@ -171,7 +171,7 @@ def main():
     if precheck() and download() and valid_checksum(tar_file, chksum):
         return compile_binary(tar_file)
     logger.warning('%s: Pre-run dependency check fail - Exit' % inspect.stack()[0][3])
-    sys.exit(exit_codes['E_DEPENDENCY']['Code'])
+    return False
 
 
 def root():
