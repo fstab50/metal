@@ -13,6 +13,7 @@ import sys
 import inspect
 import hashlib
 import tarfile
+import distro
 import subprocess
 import urllib.request
 import urllib.error
