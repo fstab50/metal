@@ -162,6 +162,46 @@ def precheck():
     return True
 
 
+def os_packages(metadata):
+    """ Installs operating system dependent packages """
+    family = metadata[0]
+    release = metadata[1]
+    codename = metadata[3]
+    if 'Amazon' in family and '2' not in release:
+        stdout_message('Identified Amazon Linux 1 os distro')
+        commands = [
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+        return True
+    elif 'Amazon' in family and '2' in release:
+        stdout_message('Identified Amazon Linux 2 os distro')
+        commands = [
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+        return True
+    elif 'Redhat' in family:
+        stdout_message('Identified Redhat Enterprise Linux os distro')
+        commands = [
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+    elif 'Ubuntu' or 'Mint' in family:
+        stdout_message('Identified Ubuntu Linux os distro')
+        commands = [
+            'sudo apt -y update', 'sudo apt -y upgrade',
+            'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+        return True
+    return False
+
+
 def stdout_message(message, prefix='INFO', quiet=False,
                                     multiline=False, tabspaces=4, severity=''):
     """ Prints message to cli stdout while indicating type and severity
@@ -220,7 +260,7 @@ def main():
     tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
     # pre-run validation + execution
-    if precheck():
+    if precheck() and os_packages(distro.linux_distribution()):
         stdout_message('begin download')
         download()
         stdout_message('begin valid_checksum')
