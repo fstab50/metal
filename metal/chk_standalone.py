@@ -17,14 +17,14 @@ import subprocess
 import urllib.request
 import urllib.error
 from colors import Colors
-import logd
+import loggers
 
 __version__ = '0.6'
-logger = logd.getLogger(__version__)
+logger = loggers.getLogger(__version__)
 
 try:
 
-    from metal.oscodes_unix import exit_codes
+    from oscodes_unix import exit_codes
     splitchar = '/'     # character for splitting paths (linux)
 
 except Exception as e:
@@ -86,7 +86,7 @@ def download():
     try:
         for file_path in urls:
             filename = file_path.split('/')[-1]
-            r = urllib.request.urlretrieve(url, TMPDIR + '/' + filename)
+            r = urllib.request.urlretrieve(file_path, TMPDIR + '/' + filename)
             if not exists(filename):
                 return False
     except urllib.error.HTTPError as e:
@@ -151,12 +151,14 @@ def precheck():
     """
     Pre-run dependency check
     """
-    if not which('make'):
-        msg = 'Dependency fail -- Unable to locate rquired binary: '
-        stdout_message('%s: %s' % (msg, ACCENT + 'make' + RESET))
-        return False
-    elif not root():
-        return False
+    binaries = ['make']
+    for bin in binaries:
+        if not which(bin):
+            msg = 'Dependency fail -- Unable to locate rquired binary: '
+            stdout_message('%s: %s' % (msg, ACCENT + bin + RESET))
+            return False
+        elif not root():
+            return False
     return True
 
 

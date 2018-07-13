@@ -86,7 +86,7 @@ def download():
     try:
         for file_path in urls:
             filename = file_path.split('/')[-1]
-            r = urllib.request.urlretrieve(url, TMPDIR + '/' + filename)
+            r = urllib.request.urlretrieve(file_path, TMPDIR + '/' + filename)
             if not exists(filename):
                 return False
     except urllib.error.HTTPError as e:
