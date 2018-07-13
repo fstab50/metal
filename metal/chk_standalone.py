@@ -167,7 +167,7 @@ def os_packages(metadata):
     """ Installs operating system dependent packages """
     family = metadata[0]
     release = metadata[1]
-    codename = metadata[3]
+    #
     if 'Amazon' in family and '2' not in release:
         stdout_message('Identified Amazon Linux 1 os distro')
         commands = [

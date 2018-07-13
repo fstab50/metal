@@ -149,24 +149,12 @@ def which(program):
     return None
 
 
-def os_detect(script):
-    """  Returns OS type """
-    path = sys.argv[0].split('/')[:-2] + '/scripts'
-    cmd = 'sh %s/os_distro.sh' % path
-    try:
-        if os.path.exists(path + '/os_distro.sh'):
-            return subprocess.getoutput(cmd).split(' ')[0]
-    except FileNotFoundError as e:
-        logger.exception('%s: Script not found: %s' % str(e))
-        return None
-
-
 def os_packages(metadata):
     """ Installs operating system dependent packages """
     family = metadata[0]
     release = metadata[1]
-    codename = metadata[3]
-    if 'Amazon' in family and '2' not in release:
+    #
+    if 'Amazon' in family and release != '2':
         stdout_message('Identified Amazon Linux 1 os distro')
         commands = [
             'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
@@ -174,10 +162,10 @@ def os_packages(metadata):
         for cmd in commands:
             stdout_message(subprocess.getoutput(cmd))
         return True
-    elif 'Amazon' in family and '2' in release:
+    elif 'Amazon' in family and release == '2':
         stdout_message('Identified Amazon Linux 2 os distro')
         commands = [
-            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development Tools"'
         ]
         for cmd in commands:
             stdout_message(subprocess.getoutput(cmd))
