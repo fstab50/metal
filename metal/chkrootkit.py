@@ -16,6 +16,7 @@ import tarfile
 import subprocess
 import urllib.request
 import urllib.error
+import distro
 from metal.script_utils import stdout_message
 from metal.colors import Colors
 from metal import logd, __version__
@@ -148,6 +149,58 @@ def which(program):
     return None
 
 
+def os_detect(script):
+    """  Returns OS type """
+    path = sys.argv[0].split('/')[:-2] + '/scripts'
+    cmd = 'sh %s/os_distro.sh' % path
+    try:
+        if os.path.exists(path + '/os_distro.sh'):
+            return subprocess.getoutput(cmd).split(' ')[0]
+    except FileNotFoundError as e:
+        logger.exception('%s: Script not found: %s' % str(e))
+        return None
+
+
+def os_packages(metadata):
+    """ Installs operating system dependent packages """
+    family = metadata[0]
+    release = metadata[1]
+    codename = metadata[3]
+    if 'Amazon' in family and '2' not in release:
+        stdout_message('Identified Amazon Linux 1 os distro')
+        commands = [
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+        return True
+    elif 'Amazon' in family and '2' in release:
+        stdout_message('Identified Amazon Linux 2 os distro')
+        commands = [
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+        return True
+    elif 'Redhat' in family:
+        stdout_message('Identified Redhat Enterprise Linux os distro')
+        commands = [
+            'sudo yum -y update', 'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+    elif 'Ubuntu' or 'Mint' in family:
+        stdout_message('Identified Ubuntu Linux os distro')
+        commands = [
+            'sudo apt -y update', 'sudo apt -y upgrade',
+            'sudo yum -y groupinstall "Development tools"'
+        ]
+        for cmd in commands:
+            stdout_message(subprocess.getoutput(cmd))
+        return True
+    return False
+
+
 def precheck():
     """
     Pre-run dependency check
@@ -171,7 +224,7 @@ def main():
     tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
     # pre-run validation + execution
-    if precheck():
+    if precheck() and os_packages(distro.linux_distribution()):
         stdout_message('begin download')
         download()
         stdout_message('begin valid_checksum')
