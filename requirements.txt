@@ -1,6 +1,7 @@
 awscli
 botocore
 boto3
+distro
 docutils
 jmespath
 metal
