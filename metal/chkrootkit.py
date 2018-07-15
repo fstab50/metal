@@ -53,8 +53,8 @@ def compile_binary(source):
     sudo ln -s
     """
     cmd = 'make sense'
-    src = '/usr/local/bin/chkrootkit'
-    dst = '/usr/local/chkrootkit/chkrootkit'
+    slink = '/usr/local/bin/chkrootkit'
+    target = '/usr/local/chkrootkit/chkrootkit'
     # Tar Extraction
     t = tarfile.open(source, 'r')
     t.extractall(TMPDIR)
@@ -63,15 +63,14 @@ def compile_binary(source):
         os.chdir(TMPDIR + '/' + extract_dir)
         logger.info('make output: \n%s' % subprocess.getoutput(cmd))
         # move directory in place
-        mv_cmd = 'sudo mv %s /usr/local/chkrootkit' % (TMPDIR + '/' + extract_dir)
-        subprocess.getoutput(mv_cmd)
+        os.rename(TMPDIR + '/' + extract_dir, 'usr/local/chkrootkit')
         # create symlink to binary in directory
-        os.symlink(dst, src)
+        os.symlink(target, slink)
         return True
     return False
 
 
-def download():
+def download(objects):
     """
     Retrieve remote file object
     """
@@ -83,10 +82,8 @@ def download():
             logger.warning(msg)
             stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
             return False
-    # url including file path
-    urls = (BINARY_URL, MD5_URL)
     try:
-        for file_path in urls:
+        for file_path in objects:
             filename = file_path.split('/')[-1]
             r = urllib.request.urlretrieve(file_path, TMPDIR + '/' + filename)
             if not exists(filename):
@@ -211,13 +208,15 @@ def main():
     # vars
     tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
+    # url including file path
+    urls = (BINARY_URL, MD5_URL)
     # pre-run validation + execution
     if precheck() and os_packages(distro.linux_distribution()):
         stdout_message('begin download')
-        download()
-        stdout_message('begin valid_checksum')
-        valid_checksum(tar_file, chksum)
-        return compile_binary(tar_file)
+        if download(urls):
+            stdout_message('begin valid_checksum')
+            valid_checksum(tar_file, chksum)
+            return compile_binary(tar_file)
     logger.warning('%s: Pre-run dependency check fail - Exit' % inspect.stack()[0][3])
     return False
 
