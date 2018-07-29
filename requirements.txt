@@ -5,6 +5,7 @@ distro
 docutils
 jmespath
 metal
+pyaws
 Pygments
 s3transfer
 six
