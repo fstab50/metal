@@ -38,14 +38,8 @@ except Exception:
     splitchar = '\\'    # character for splitting paths (window
 
 # global objects
-config = ConfigParser()
 logger = logd.getLogger(__version__)
-
-# global vars
-IAM_KEYS = ['aws_access_key_id', 'aws_secret_access_key']
-VALID_OPERATIONS = ('list', 'up', 'metal', 'rotate')
-ROTATE_OPERATIONS = ('up', 'metal', 'rotate')
-DBUG_FILE = 'test-credentials'
+VALID_INSTALL = ('chkrootkit', 'rkhunter')
 
 
 def authenticated(profile):
@@ -128,76 +122,6 @@ def help_menu():
     return
 
 
-def get_current_key(profile_name, surrogate=''):
-    """
-    Summary:
-        Extracts the STS AccessKeyId currently utilised in user's
-        profile in the local awscli configuration
-    Args:
-        profile_name:  a username in local awscli profile
-    Returns:
-        key_id (str): Amazon STS AccessKeyId
-    Raises:
-        Exception if profile_name not found in config
-    """
-    if surrogate:
-        profile_name = surrogate
-    #
-    awscli = 'aws'
-    cmd = 'type ' + awscli + ' 2>/dev/null'
-    if subprocess.getoutput(cmd):
-        cmd = awscli + ' configure get ' + profile_name + '.aws_access_key_id'
-    try:
-        key_id = subprocess.getoutput(cmd)
-    except Exception as e:
-        logger.exception(
-            '%s: Failed to identify AccessKeyId used in %s profile.' %
-            (inspect.stack()[0][3], profile_name))
-        return ''
-    return key_id
-
-
-def parse_awscli():
-    """
-    Summary:
-        parse, update local awscli config credentials
-    Args:
-        :user (str):  USERNAME, only required when run on windows os
-    Returns:
-        TYPE: configparser object, parsed config file
-    """
-    OS = platform.system()
-    if OS == 'Linux':
-        HOME = os.environ['HOME']
-        default_credentials_file = HOME + '/.aws/credentials'
-        alt_credentials_file = shared_credentials_location()
-        awscli_file = alt_credentials_file or default_credentials_file
-    elif OS == 'Windows':
-        win_username = os.getenv('username')
-        default_credentials_file = 'C:\\Users\\' + win_username + '\\.aws\\credentials'
-        alt_credentials_file = shared_credentials_location()
-        awscli_file = alt_credentials_file or default_credentials_file
-    else:
-        logger.warning('Unsupported OS. Exit')
-        logger.warning(exit_codes['E_ENVIRONMENT']['Reason'])
-        sys.exit(exit_codes['E_ENVIRONMENT']['Code'])
-
-    try:
-        if os.path.isfile(awscli_file):
-            # parse config
-            config.read(awscli_file)
-        else:
-            logger.info(
-                'awscli credentials file [%s] not found. Abort' % awscli_file
-            )
-            raise OSError
-    except Exception as e:
-        logger.exception(
-            '%s: problem parsing local awscli config file %s' %
-            (inspect.stack()[0][3], awscli_file))
-    return config, awscli_file
-
-
 def set_logging(cfg_obj):
     """
     Enable or disable logging per config object parameter
@@ -244,59 +168,6 @@ def precheck():
     return False
 
 
-def map_identity(profile):
-    """
-    Summary:
-        retrieves iam user info for profiles in awscli config
-    Args:
-        :user (str): string, local profile user from which the current
-           boto3 session object created
-    Returns:
-        :iam_user (str): AWS iam user corresponding to the provided
-           profile user in local config
-    """
-    try:
-        sts_client = boto3_session(service='sts', profile=profile)
-        r = sts_client.get_caller_identity()
-        iam_user = r['Arn'].split('/')[1]
-        account = r['Account']
-        logger.info(
-            '%s: profile_name mapped to iam_user: %s' %
-            (inspect.stack()[0][3], iam_user)
-            )
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'InvalidClientTokenId':
-            stdout_message(
-                ('%s: Expired or invalid credentials to authenticate for profile user (%s). Exit. [Code: %d]'
-                % (inspect.stack()[0][3], profile, exit_codes['EX_NOPERM']['Code'])),
-                prefix='AUTH', severity='WARNING'
-                )
-            logger.warning(exit_codes['EX_NOPERM']['Reason'])
-            sys.exit(exit_codes['EX_NOPERM']['Code'])
-        else:
-            logger.warning(
-                '%s: Inadequate User permissions (Code: %s Message: %s)' %
-                (inspect.stack()[0][3], e.response['Error']['Code'],
-                 e.response['Error']['Message']))
-            raise e
-    return iam_user, account
-
-
-def calc_age(create_dt):
-    """ Calculates Access key age from today given it's creation date
-
-    Args:
-        - **create_dt (datetime object)**: the STS CreateDate parameter returned
-          with key key_metadata when an iam access key is created
-    Returns:
-        TYPE: str, age from today in human readable string format
-    """
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
-    delta_td = now - create_dt
-    readable_age = convert_dt_time(delta_td)
-    return readable_age, delta_td
-
-
 class SetLogging():
     """
     Summary:
@@ -326,13 +197,6 @@ class SetLogging():
                 )
             return False
         return True
-
-
-def parameters(args):
-    parameter_str = ''
-    for arg in args:
-        parameter_str += arg + ' '
-    return parameter_str
 
 
 def main(operation, profile, auto, debug, user_name=''):
@@ -412,9 +276,8 @@ def options(parser, help_menu=False):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-o", "--operation", nargs='?', default='list', type=str,
-                        choices=VALID_OPERATIONS, required=False)
-    parser.add_argument("-u", "--user-name", dest='username', type=str, required=False)
+    parser.add_argument("-i", "--install", nargs='?', default='list', type=str,
+                        choices=VALID_INSTALL, required=False)
     parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
     parser.add_argument("-c", "--configure", dest='configure', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
@@ -429,6 +292,13 @@ def package_version():
     """
     print(about.about_object)
     sys.exit(exit_codes['EX_OK']['Code'])
+
+
+def parameters(args):
+    parameter_str = ''
+    for arg in args:
+        parameter_str += arg + ' '
+    return parameter_str
 
 
 def shared_credentials_location():
@@ -472,6 +342,20 @@ def option_configure(debug=False, path=None):
     return r
 
 
+def rkhunter():
+    cmd = 'sudo sh rkinstaller.sh ' + parameters(sys.argv[1:])
+    try:
+        subprocess.call(
+                [cmd],
+                shell=True,
+                cwd=os.getcwd() + '/' + 'rkhunter'
+            )
+    except Exception as e:
+        logger.exception(f'{inspect.stack()[0][3]}: invalid rkhunter installer args. Exit')
+        return False
+    return True
+
+
 def init_cli():
     # parser = argparse.ArgumentParser(add_help=False, usage=help_menu())
     parser = argparse.ArgumentParser(add_help=False)
@@ -497,6 +381,14 @@ def init_cli():
     elif args.configure:
         r = option_configure(args.debug, local_config['PROJECT']['CONFIG_PATH'])
         return r
+
+    elif args.install:
+        if args.install == 'rkhunter':
+            r = rkhunter()
+        elif args.install == 'chkrootkit':
+            print('invoke chkrootkit installer')
+        sys.exit(exit_codes['EX_OK']['Code'])
+
     else:
         if precheck():              # if prereqs set, run
             if authenticated(profile=args.profile):
