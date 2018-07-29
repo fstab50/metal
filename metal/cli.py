@@ -26,9 +26,10 @@ import inspect
 import subprocess
 import boto3
 from botocore.exceptions import ClientError, ProfileNotFound
-from pyaws.core.script_utils import stdout_message
+from pyaws.core.script_utils import stdout_message, debug_mode
 from metal.colors import Colors
-from metal import about, configuration, logd, __version__
+from metal import about, logd, __version__
+from metal.statics import local_config
 
 try:
     from metal.oscodes_unix import exit_codes
@@ -251,7 +252,7 @@ def options(parser, help_menu=False):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-i", "--install", nargs='?', default='list', type=str, choices=VALID_INSTALL, required=False)
+    parser.add_argument("-i", "--install", dest='install', nargs='?', default='NA', type=str, choices=VALID_INSTALL, required=False)
     parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
     parser.add_argument("-c", "--configure", dest='configure', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
@@ -316,13 +317,31 @@ def option_configure(debug=False, path=None):
     return r
 
 
-def rkhunter():
-    cmd = 'sudo sh rkinstaller.sh ' + parameters(sys.argv[1:])
+def module_path():
+    """
+    Returns current fs directory location of enclosing module at runtime
+    """
+    return os.path.dirname(os.path.realpath(__file__))
+
+
+def rkhunter(caller='console_script'):
+    """
+    Summary:
+        - Console Script target for rkhunter installer
+        - Called from either invoking console script "rkinstaller" directly,
+          or metal with the --install rkhunter parameter
+    Returns:
+        Success | Failure, TYPE: bool
+    """
+    if caller == 'console_script':
+        cmd = 'sudo sh rkinstaller.sh ' + parameters(sys.argv[1:])
+    else:
+        cmd = 'sudo sh rkinstaller.sh ' + parameters(sys.argv[3:])
     try:
         subprocess.call(
                 [cmd],
                 shell=True,
-                cwd=os.getcwd() + '/' + 'rkhunter'
+                cwd=module_path() + '/' + 'rkhunter'
             )
     except Exception as e:
         logger.exception(f'{inspect.stack()[0][3]}: invalid rkhunter installer args. Exit')
@@ -358,9 +377,14 @@ def init_cli():
 
     elif args.install:
         if args.install == 'rkhunter':
-            r = rkhunter()
+            r = rkhunter(caller='main')
         elif args.install == 'chkrootkit':
-            print('invoke chkrootkit installer')
+            print('invoke chkrootkit installer - FUTURE')
+        elif args.install == 'NA':
+            print(
+                'You must provide either chkrootkit or \
+                rkhunter as a parameter when using --install'
+                )
         sys.exit(exit_codes['EX_OK']['Code'])
 
     else:
