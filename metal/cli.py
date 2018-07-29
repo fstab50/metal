@@ -21,12 +21,12 @@ Dependencies:
 import os
 import sys
 import platform
-from configparser import ConfigParser
 import argparse
 import inspect
 import subprocess
 import boto3
 from botocore.exceptions import ClientError, ProfileNotFound
+from pyaws.core.script_utils import stdout_message
 from metal.colors import Colors
 from metal import about, configuration, logd, __version__
 
@@ -205,51 +205,26 @@ def main(operation, profile, auto, debug, user_name=''):
     """
     if user_name:
         logger.info('user_name parameter given (%s) as surrogate' % user_name)
+    try:
+        if operation in VALID_INSTALL:
+            print(operation)
+        elif operation == 'list':
+            print(operation)
+            return True
+        elif not operation:
+            msg_accent = (Colors.BOLD + 'list' + Colors.RESET + ' | ' + Colors.BOLD + 'up' + Colors.RESET)
+            msg = """You must provide a valid OPERATION for --operation parameter:
 
-    cmd = 'sudo sh rkhunter-install.sh ' + parameters(sys.argv[1:])
-
-    subprocess.call(
-            [cmd], shell=True,
-            cwd='/home/blake/git/Security/gensec/rkhunter'
-            )
-
-    sys.exit(0)
-    # find out to which iam user profile name maps
-    user, aws_account = map_identity(profile=profile)
-
-    if operation in ROTATE_OPERATIONS:
-        # check local awscli config for active temporary sts credentials
-        if clean_config(quiet=auto):
-            keylist, key_metadata = list_keys(
-                    account=aws_account,
-                    profile=profile,
-                    iam_user=user,
-                    surrogate=user_name,
-                    stage='BEFORE ROTATION',
-                    quiet=auto
-                )
-    elif operation == 'list':
-        # list operation; display current access key(s) and exit
-        keylist, key_metadata = list_keys(
-                account=aws_account, profile=profile, iam_user=user,
-                surrogate=user_name, quiet=auto
-            )
-        return True
-    elif not operation:
-        msg_accent = (Colors.BOLD + 'list' + Colors.RESET + ' | ' + Colors.BOLD + 'up' + Colors.RESET)
-        msg = """You must provide a valid OPERATION for --operation parameter:
-
-                --operation { """ + msg_accent + """ }
-        """
-        stdout_message(msg)
-        logger.warning('%s: No valid operation provided. Exit' % (inspect.stack()[0][3]))
-        sys.exit(exit_codes['E_MISC']['Code'])
-    else:
-        msg = 'Unknown operation. Exit'
-        stdout_message(msg)
-        logger.warning('%s: %s' % (msg, inspect.stack()[0][3]))
-        sys.exit(exit_codes['E_MISC']['Code'])
-
+                    --operation { """ + msg_accent + """ }
+            """
+            stdout_message(msg)
+            logger.warning('%s: No valid operation provided. Exit' % (inspect.stack()[0][3]))
+            sys.exit(exit_codes['E_MISC']['Code'])
+        else:
+            msg = 'Unknown operation. Exit'
+            stdout_message(msg)
+            logger.warning('%s: %s' % (msg, inspect.stack()[0][3]))
+            sys.exit(exit_codes['E_MISC']['Code'])
     except KeyError as e:
         logger.critical(
             '%s: Cannot find Key %s' %
@@ -276,8 +251,7 @@ def options(parser, help_menu=False):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-i", "--install", nargs='?', default='list', type=str,
-                        choices=VALID_INSTALL, required=False)
+    parser.add_argument("-i", "--install", nargs='?', default='list', type=str, choices=VALID_INSTALL, required=False)
     parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
     parser.add_argument("-c", "--configure", dest='configure', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
