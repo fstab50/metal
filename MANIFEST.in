@@ -2,7 +2,11 @@
 include README.md
 include DESCRIPTION.rst
 include LICENSE
-recursive-include metal/rkhunter *
+recursive-include metal/rkhunter *.sh
+recursive-include metal/rkhunter/core *
+recursive-include metal/rkhunter/config *
+recursive-include metal/rkhunter/skdet *
+recursive-include metal/rkhunter/unhide *
 
 # exclude
 exclude .gitignore
