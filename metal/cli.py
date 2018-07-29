@@ -252,7 +252,7 @@ def options(parser, help_menu=False):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-i", "--install", dest='install', nargs='?', default='NA', type=str, choices=VALID_INSTALL, required=False)
+    parser.add_argument("-i", "--install", dest='install', default='NA', type=str, choices=VALID_INSTALL, required=False)
     parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
     parser.add_argument("-c", "--configure", dest='configure', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
