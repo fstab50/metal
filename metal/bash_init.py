@@ -34,7 +34,7 @@ def parameters(args):
     # CAN perform user interface operations for interaction
 
 
-cmd = 'sudo sh rkhunter-install.sh ' + parameters(sys.argv[1:])
+cmd = 'sudo sh rkinstaller.sh ' + parameters(sys.argv[1:])
 
 subprocess.call(
         [cmd], shell=True,
