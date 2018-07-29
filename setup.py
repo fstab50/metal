@@ -92,7 +92,7 @@ setup(
     entry_points={
         'console_scripts': [
             'metal=metal.cli:init_cli',
-            'metalconfig=metal.cli:option_configure'
+            'rkinstaller=metal.cli:rkhunter'
             'chkinstall=metal.chkrootkit:main'
         ]
     },
