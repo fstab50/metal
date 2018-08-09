@@ -42,6 +42,12 @@ except Exception:
 logger = logd.getLogger(__version__)
 VALID_INSTALL = ('chkrootkit', 'rkhunter')
 
+# color codes
+BD = Colors.BOLD
+TITLE = Colors.WHITE + Colors.BOLD
+ACCENT = Colors.BOLD + Colors.ORANGE
+RESET = Colors.RESET
+
 
 def help_menu():
     """
@@ -281,6 +287,39 @@ def rkhunter(caller='console_script'):
     return True
 
 
+def chooser_menu():
+    """ Master jump off point to ancillary functionality """
+    title = TITLE + "The" + Colors.ORANGE + " Metal" + Colors.RESET + TITLE + " Menu" + RESET
+    menu = """
+        ________________________________________________________________
+
+            """ + title + """
+        ________________________________________________________________
+
+
+                ( a ) :  Install RKhunter Rootkit Scanner (v1.6)
+
+                ( b ) :  Install Chkrootkit Rootkit Scanner (latest)
+
+                ( c ) :  Run RKhunter Scan of Local Machine
+
+                ( d ) :  Run Chkrootkit Scan of Local Machine
+
+    """
+    print(menu)
+    answer: str = input("\t\tEnter Choice [quit]:  ") or ''
+
+    if answer == 'a':
+        return rkhunter()
+    elif answer == 'b':
+        print('run chkrootkit installer')
+    elif answer == 'c':
+        print('run rkhunter scan of local machine')
+    elif answer == 'd':
+        return chkrootkit_exec()
+    return True
+
+
 def init_cli():
     # parser = argparse.ArgumentParser(add_help=False, usage=help_menu())
     parser = argparse.ArgumentParser(add_help=False)
@@ -293,8 +332,7 @@ def init_cli():
         sys.exit(exit_codes['EX_OK']['Code'])
 
     if len(sys.argv) == 1:
-        help_menu()
-        sys.exit(exit_codes['EX_OK']['Code'])
+        return chooser_menu()
 
     elif args.help:
         help_menu()
