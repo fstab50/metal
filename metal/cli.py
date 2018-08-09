@@ -20,7 +20,6 @@ Dependencies:
 
 import os
 import sys
-import platform
 import argparse
 import inspect
 import subprocess
@@ -28,7 +27,7 @@ import boto3
 from botocore.exceptions import ClientError, ProfileNotFound
 from pyaws.core.script_utils import stdout_message, debug_mode
 from metal.colors import Colors
-from metal import about, logd, __version__
+from metal import about, logd, __version__, chkrootkit
 from metal.statics import local_config
 
 try:
@@ -46,6 +45,7 @@ VALID_INSTALL = ('chkrootkit', 'rkhunter')
 BD = Colors.BOLD
 TITLE = Colors.WHITE + Colors.BOLD
 ACCENT = Colors.BOLD + Colors.ORANGE
+WT = Colors.WHITE
 RESET = Colors.RESET
 
 
@@ -297,13 +297,13 @@ def chooser_menu():
         ________________________________________________________________
 
 
-                ( a ) :  Install RKhunter Rootkit Scanner (v1.6)
+                ( """ + TITLE + "a" + RESET + """ ) :  Install RKhunter Rootkit Scanner (v1.6)
 
-                ( b ) :  Install Chkrootkit Rootkit Scanner (latest)
+                ( """ + TITLE + "b" + RESET + """ ) :  Install Chkrootkit Rootkit Scanner (latest)
 
-                ( c ) :  Run RKhunter Scan of Local Machine
+                ( """ + TITLE + "c" + RESET + """ ) :  Run RKhunter Scan of Local Machine
 
-                ( d ) :  Run Chkrootkit Scan of Local Machine
+                ( """ + TITLE + "d" + RESET + """ ) :  Run Chkrootkit Scan of Local Machine
 
     """
     print(menu)
@@ -311,10 +311,14 @@ def chooser_menu():
 
     if answer == 'a':
         return rkhunter()
+
     elif answer == 'b':
-        print('run chkrootkit installer')
+        print('\t\nrun chkrootkit installer\n')
+        return chkrootkit.main()
+
     elif answer == 'c':
-        print('run rkhunter scan of local machine')
+        print('\t\nrun rkhunter scan of local machine\n')
+
     elif answer == 'd':
         return chkrootkit_exec()
     return True

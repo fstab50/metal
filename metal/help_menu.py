@@ -35,8 +35,6 @@ menu_body = Colors.BOLD + """
 
                     -p, --profile    <value>
                     -o, --operation  <value>
-                   [-u, --user-name  <value> ]
-                   [-a, --auto     ]
                    [-c, --configure]
                    [-V, --version  ]
                    [-d, --debug    ]
