@@ -30,13 +30,10 @@ import metal
 
 
 requires = [
-    'awscli',
-    'botocore',
-    'docutils',
-    'jmespath',
+    'boto3',
+    'pyaws>=0.1.18',
     'Pygments',
-    's3transfer',
-    'six'
+
 ]
 
 
