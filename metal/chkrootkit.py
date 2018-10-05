@@ -148,9 +148,10 @@ def which(program):
 
 def os_packages(metadata):
     """ Installs operating system dependent packages """
+
     family = metadata[0]
     release = metadata[1]
-    #
+
     if 'Amazon' in family and release != '2':
         stdout_message('Identified Amazon Linux 1 os distro')
         commands = [
@@ -159,6 +160,7 @@ def os_packages(metadata):
         for cmd in commands:
             stdout_message(subprocess.getoutput(cmd))
         return True
+
     elif 'Amazon' in family and release == '2':
         stdout_message('Identified Amazon Linux 2 os distro')
         commands = [
@@ -167,6 +169,7 @@ def os_packages(metadata):
         for cmd in commands:
             stdout_message(subprocess.getoutput(cmd))
         return True
+
     elif 'Redhat' in family:
         stdout_message('Identified Redhat Enterprise Linux os distro')
         commands = [
@@ -174,6 +177,7 @@ def os_packages(metadata):
         ]
         for cmd in commands:
             stdout_message(subprocess.getoutput(cmd))
+
     elif 'Ubuntu' or 'Mint' in family:
         stdout_message('Identified Ubuntu Linux os distro')
         commands = [
@@ -190,7 +194,9 @@ def precheck():
     """
     Pre-run dependency check
     """
+
     binaries = ['make']
+
     for bin in binaries:
         if not which(bin):
             msg = 'Dependency fail -- Unable to locate rquired binary: '
@@ -207,12 +213,17 @@ def main():
     """
     # vars
     tar_file = TMPDIR + '/' + BINARY_URL.split('/')[-1]
+
     chksum = TMPDIR + '/' + MD5_URL.split('/')[-1]
+
     # url including file path
     urls = (BINARY_URL, MD5_URL)
+
     # pre-run validation + execution
     if precheck() and os_packages(distro.linux_distribution()):
+
         stdout_message('begin download')
+
         if download(urls):
             stdout_message('begin valid_checksum')
             valid_checksum(tar_file, chksum)
