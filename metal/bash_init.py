@@ -69,3 +69,25 @@ with process.stdout:
         #process.kill()      # DOES NOT WORK
     else:
         raise BadRCError("Bad rc (%s) for cmd '%s': %s" % (p.returncode, cmd, stdout + stderr))
+
+
+# Method 3: subprocess.Popen  --------------------------------------------------
+
+    # - can process output if required?
+    #
+
+out, err = subprocess.Popen([cmd], stdout=subprocess.PIPE).communicate()
+
+
+# Method 4: subprocess.Popen  --------------------------------------------------
+
+    # - can process output if required?
+    #
+
+r = subprocess.Popen(['ls','-l'], stdout=subprocess.PIPE)
+out = r.stdout.readlines()
+
+# or, if you want to read line-by-line (maybe the other process is more intensive than ls):
+
+for ln in ls.stdout:
+    # process each line of output individually
