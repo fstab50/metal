@@ -1,63 +1,34 @@
 <a name="top"></a>
 * * *
-# Rkhunter Installer
+# spotprices
 * * *
 
 ## Summary
 
-Utility for installing and configuring the latest version of [Rkhunter Malware Scanner](https://en.wikipedia.org/wiki/Rkhunter) for linux.
+Python security and compliance (Python3)
 
-Rkhunter Installer, version **1.7**
+**Version**: 0.1.8
 
 * * *
-
 ## Contents
 
-* [Getting Started](#getting-started)
-* [Scope](#scope)
-* [Dependencies](#dependencies)
-* [Instructions](#instructions)
-* [Help](#help)
-* [Author & Copyright](#author--copyright)
-* [License](#license)
-* [Disclaimer](#disclaimer)
+* [**Dependencies**](#dependencies)
 
+* [**Program Options**](#program-options)
 
-* * *
+* [**Configuration**](#configuration)
 
-## Getting Started
+* [**Installation**](#installation)
 
-See the following resources before getting started:
+* [**Screenshots**](#screenshots)
 
-- Rkhunter [Project Site](http://rkhunter.sourceforge.net/) on Sourceforge
-- Rkhunter Official [README](https://sourceforge.net/p/rkhunter/rkh_code/ci/master/tree/files/README)
+* [**Author & Copyright**](#author--copyright)
 
-[back to the top](#top)
+* [**License**](#license)
 
-* * *
+* [**Disclaimer**](#disclaimer)
 
-## Scope
-
-rkhunter-install will perform the following on your system to satisfy Rkhunter dependencies:
-
-* **Perl Modules**:  
-    - Installation of `cpan` if required
-    - Installation of Perl module dependencies that rkhunter uses for malware or other checks
-
-* **C Library**: `unhide`
-    - required for discovery of hidden processes
-    - compiles, installs
-
-* **C Library**: `skdet`
-    - required for specialized rootkit detection
-    - compiles, installs
-
-* **Uninstall Utility**
-    - Installs uninstall utility in local config directory should you ever need to remove Rkhunter
-
-* **Configuration File**
-    - generates local configuration file required for uninstall
-
+--
 
 [back to the top](#top)
 
@@ -65,73 +36,8 @@ rkhunter-install will perform the following on your system to satisfy Rkhunter d
 
 ## Dependencies
 
-* Ubuntu, Ubuntu variants, 14.04
-* Ubuntu, Ubuntu variants, 16.04+
-* Redhat, Centos v7.0+
-* [Amazon Linux](https://aws.amazon.com/amazon-linux-ami) 2017+
-* Installation of required fonts (`ttf-mscorefonts-installer`)
-
-[back to the top](#top)
-
-* * *
-
-## Instructions
-
-Run the installer from the cli via the following command:
-
-```bash
-    $ sudo sh rkhunter-install.sh
-```
-
-Installation directory is set using the `--layout` parameter:
-
-```bash
-
-    $ sudo sh rkhunter-install.sh --layout /usr    
-
-        # install directory /usr/bin
-
-```
-
-If the `--layout` parameter is not provided, the following is assumed:
-
-```bash
-
-    $ sudo sh rkhunter-install.sh --layout "default"    
-
-        # install directory /usr/local/bin
-
-```
-
-**NOTE**:
-* Root privileges (sudo) must be used or run the installer directly as root
-* The installer performs an integrity check using sha256 on all files it
-retrieves.  The installation will only proceed if integrity check passes.
-
-[back to the top](#top)
-
-* * *
-
-## Help
-
-To display the help menu:
-
-```bash
-    $ sh rkhunter-install.sh --help
-```
-
-[![help](./assets/help-menu.png)](https://rawgithub.com/fstab50/gensec/master/rkhunter/assets/help-menu.png)
-
-
-To display help menu for the `--configure` option:
-
-```bash
-    $ sh rkhunter-install.sh --configure
-```
-
-[![help-configure](./assets/help-configure.png)](https://rawgithub.com/fstab50/gensec/master/rkhunter/assets/help-configure.png)
-
-
+* Python 3.6+
+* Linux operating system
 
 [back to the top](#top)
 
@@ -149,7 +55,11 @@ All works contained herein copyrighted via below author unless work is explicitl
 
 ## License
 
-* Software contained in this repo is licensed under the [license agreement](./LICENSE.md).
+* Software contained in this repo is licensed under the [license agreement](./LICENSE.md).  You may display the license and copyright information by issuing the following command:
+
+```
+$ metal --version
+```
 
 [back to the top](#top)
 
@@ -164,5 +74,3 @@ Additional terms may be found in the complete [license agreement](./LICENSE.md).
 [back to the top](#top)
 
 * * *
-
-[back to repository README](../README.md)
