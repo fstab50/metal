@@ -4,6 +4,7 @@ boto3
 distro
 docutils
 jmespath
+libtools
 metal
 pyaws
 Pygments

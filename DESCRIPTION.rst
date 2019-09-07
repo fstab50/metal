@@ -2,6 +2,8 @@
 **metal** | Installation & Configuration for Security Applications
 ------------------------------------------------------------------
 
+PACKAGE: metal
+
 ``metal``: is a security application configuration and installer for Linux.
 
 * Malware and vulnerability scanners for Linux
