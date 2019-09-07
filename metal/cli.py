@@ -25,7 +25,8 @@ import inspect
 import subprocess
 import boto3
 from botocore.exceptions import ClientError, ProfileNotFound
-from pyaws.core.script_utils import stdout_message, debug_mode
+from pyaws.utils import stdout_message
+from pyaws.script_utils import debug_mode
 from metal.colors import Colors
 from metal import about, logd, __version__, chkrootkit
 from metal.statics import local_config
